@@ -6,23 +6,74 @@ datasource db {
   provider = "postgresql"
 }
 
-model Project {
+model Profile {
   id          String   @id @default(cuid())
+  name        String
   title       String
-  slug        String   @unique
-  description String   @db.Text
-  content     String?  @db.Text
+  summary     String   @db.Text
+  email       String
+  phone       String
+  location    String
+  linkedin    String
+  github      String?
+  leetcode    String?
+  codechef    String?
+  codeforces  String?
+  hackerrank  String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Education {
+  id          String   @id @default(cuid())
+  degree      String
+  institution String
+  location    String
+  period      String
+  score       String
+  order       Int      @default(0)
+}
+
+model Skill {
+  id       String @id @default(cuid())
+  name     String
+  category String
+  order    Int    @default(0)
+}
+
+model Achievement {
+  id          String  @id @default(cuid())
+  title       String
+  description String  @db.Text
+  icon        String?
+  order       Int     @default(0)
+}
+
+model Certificate {
+  id     String  @id @default(cuid())
+  title  String
+  issuer String
+  link   String?
+  order  Int     @default(0)
+}
+
+model Project {
+  id          String         @id @default(cuid())
+  title       String
+  slug        String         @unique
+  description String         @db.Text
+  content     String?        @db.Text
   coverImage  String
   images      ProjectImage[]
   modelUrl    String?
   tags        Tag[]
   liveUrl     String?
   repoUrl     String?
-  featured    Boolean  @default(false)
-  published   Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  featured    Boolean        @default(false)
+  published   Boolean        @default(true)
+  order       Int            @default(0)
+  feedback    Feedback[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
 
 model ProjectImage {
@@ -39,18 +90,20 @@ model Tag {
 }
 
 model Feedback {
-  id         String   @id @default(cuid())
-  name       String
-  email      String?
-  message    String   @db.Text
-  rating     Int?
-  approved   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  message   String   @db.Text
+  rating    Int?     @default(5)
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
 }
 
 model Admin {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  passwordHash  String
-  createdAt     DateTime  @default(now())
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
 }

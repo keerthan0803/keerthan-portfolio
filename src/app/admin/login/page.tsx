@@ -1,112 +1,94 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Shield, Lock, Mail, ArrowLeft, Terminal, Sparkles } from "lucide-react";
-import { ParticleBackground } from "@/components/3d/ParticleBackground";
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { Eye, EyeOff } from 'lucide-react'
 
-export default function AdminLoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function LoginPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
-    setTimeout(() => {
-      if (email === "admin@keerthan.dev" && password === "admin123") {
-        router.push("/admin/dashboard");
-      } else {
-        setError("Invalid administrator credentials. Demo: admin@keerthan.dev / admin123");
-        setLoading(false);
-      }
-    }, 800);
-  };
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    setLoading(false)
+
+    if (res?.error) {
+      setError('Invalid email or password')
+      return
+    }
+
+    router.push('/admin/dashboard')
+  }
 
   return (
-    <main className="relative min-h-screen bg-[#030308] text-slate-100 flex items-center justify-center p-4">
-      <ParticleBackground />
+    <div className="flex min-h-screen items-center justify-center bg-bg text-text selection:bg-accent selection:text-bg p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm space-y-5 rounded-xl border border-border bg-surface p-8 shadow-xl"
+      >
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-text">Admin Login</h1>
+          <p className="mt-1 text-xs text-text-muted">Enter credentials to access admin control center.</p>
+        </div>
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* Back Link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-cyan-400 mb-8 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Main Portfolio
-        </Link>
+        {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
 
-        <div className="glass-card p-8 sm:p-10 rounded-3xl border border-white/10 space-y-6">
-          {/* Logo & Header */}
-          <div className="text-center space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 p-[1px] mx-auto shadow-xl shadow-cyan-500/20">
-              <div className="w-full h-full bg-black/90 rounded-[15px] flex items-center justify-center">
-                <Shield className="w-7 h-7 text-cyan-400" />
-              </div>
-            </div>
-            <h1 className="text-2xl font-bold text-white">Admin Control Center</h1>
-            <p className="text-xs text-zinc-400">Authenticate to manage projects, feedback & analytics</p>
-          </div>
+        <div>
+          <label className="block text-xs font-semibold text-text-muted mb-1">Email Address</label>
+          <input
+            type="email"
+            placeholder="keerthanpentam@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-md border border-border bg-surface-alt px-4 py-2 text-sm text-text outline-none focus:border-accent"
+            required
+          />
+        </div>
 
-          {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono">
-              {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1.5">Admin Email</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@keerthan.dev"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:border-cyan-400 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1.5">Secret Key / Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:border-cyan-400 focus:outline-none"
-                />
-              </div>
-            </div>
-
+        <div>
+          <label className="block text-xs font-semibold text-text-muted mb-1">Password</label>
+          <div className="relative flex items-center">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-md border border-border bg-surface-alt pl-4 pr-10 py-2 text-sm text-text outline-none focus:border-accent"
+              required
+            />
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 text-white font-semibold text-sm hover:opacity-90 shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 text-text-muted hover:text-text transition focus:outline-none"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {loading ? "Authenticating..." : "Sign In to Dashboard"}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
-          </form>
-
-          <div className="pt-4 border-t border-white/10 text-center">
-            <span className="text-[11px] text-zinc-500 font-mono">
-              Demo Access: admin@keerthan.dev • pass: admin123
-            </span>
           </div>
         </div>
-      </div>
-    </main>
-  );
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-md bg-accent py-2.5 text-sm font-medium text-bg transition hover:bg-accent-hover disabled:opacity-50"
+        >
+          {loading ? 'Signing in...' : 'Sign In to Dashboard'}
+        </button>
+      </form>
+    </div>
+  )
 }
