@@ -230,7 +230,7 @@ function ResponsiveBlobGroup({
   const isMobile = size.width < 768
 
   return (
-    <group position={isMobile ? [0, -0.4, -0.5] : [1.8, 0, 0]} scale={isMobile ? 0.75 : 1}>
+    <group position={isMobile ? [0.3, -0.4, -0.5] : [2.5, 0, 0]} scale={isMobile ? 0.75 : 1}>
       <LiquidBlob scrollRef={scrollRef} />
       <GridFloor />
 
@@ -263,7 +263,7 @@ function ScrollCameraRig({ scrollRef }: { scrollRef: React.MutableRefObject<numb
     current.current.y = THREE.MathUtils.lerp(current.current.y, targetY, 0.05)
     current.current.angle = THREE.MathUtils.lerp(current.current.angle, targetAngle, 0.05)
 
-    const offsetX = isMobile ? 0 : 1.0
+    const offsetX = isMobile ? 0.1 : 1.4
     camera.position.x = offsetX + Math.sin(current.current.angle) * current.current.z
     camera.position.z = Math.cos(current.current.angle) * current.current.z
     camera.position.y = current.current.y + -pointer.y * 0.4

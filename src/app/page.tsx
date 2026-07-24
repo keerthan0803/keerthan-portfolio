@@ -196,7 +196,7 @@ export default function HomePage() {
       </div>
 
       {/* HERO TEXT */}
-      <section className="relative z-10 flex h-screen w-full items-end pb-16 sm:pb-24">
+      <section className="relative z-10 flex min-h-screen w-full flex-col justify-start pt-20 sm:pt-24 pb-16">
         <div className="mx-4 max-w-xl rounded-2xl border border-border/60 bg-bg/85 p-6 backdrop-blur-md shadow-xl sm:mx-8 sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
           <p className="text-xs uppercase tracking-widest text-accent font-semibold">{profile?.title || 'AI & Full-Stack Developer'}</p>
           <h1 className="mt-2 font-heading text-4xl font-black text-text sm:text-6xl">Hi, I'm {profile?.name || 'Pentam Keerthan'}</h1>
