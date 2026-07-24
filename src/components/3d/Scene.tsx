@@ -214,17 +214,48 @@ function NavMarker({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Responsive Group Helper                                            */
+/* ------------------------------------------------------------------ */
+
+function ResponsiveBlobGroup({
+  scrollRef,
+  markers,
+  onSelect,
+}: {
+  scrollRef: React.MutableRefObject<number>
+  markers: { label: string; angle: number; radius: number }[]
+  onSelect: (label: string) => void
+}) {
+  const { size } = useThree()
+  const isMobile = size.width < 768
+
+  return (
+    <group position={isMobile ? [0, -0.4, -0.5] : [1.8, 0, 0]} scale={isMobile ? 0.75 : 1}>
+      <LiquidBlob scrollRef={scrollRef} />
+      <GridFloor />
+
+      {markers.map((m) => (
+        <NavMarker key={m.label} {...m} onSelect={onSelect} />
+      ))}
+
+      <ContactShadows position={[0, -2.15, 0]} opacity={0.15} scale={10} blur={2.6} color="#241C15" />
+    </group>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scroll-driven camera rig                                           */
 /* ------------------------------------------------------------------ */
 
 function ScrollCameraRig({ scrollRef }: { scrollRef: React.MutableRefObject<number> }) {
-  const { camera, pointer } = useThree()
+  const { camera, pointer, size } = useThree()
   const current = useRef({ z: 7, y: 0, angle: 0 })
 
   useFrame(() => {
     const s = scrollRef.current
+    const isMobile = size.width < 768
 
-    const targetZ = 7 - s * 2.4
+    const targetZ = (isMobile ? 8.5 : 7) - s * 2.4
     const targetY = s * 0.6
     const targetAngle = s * Math.PI * 0.35 + pointer.x * 0.25
 
@@ -232,10 +263,11 @@ function ScrollCameraRig({ scrollRef }: { scrollRef: React.MutableRefObject<numb
     current.current.y = THREE.MathUtils.lerp(current.current.y, targetY, 0.05)
     current.current.angle = THREE.MathUtils.lerp(current.current.angle, targetAngle, 0.05)
 
-    camera.position.x = 1.0 + Math.sin(current.current.angle) * current.current.z
+    const offsetX = isMobile ? 0 : 1.0
+    camera.position.x = offsetX + Math.sin(current.current.angle) * current.current.z
     camera.position.z = Math.cos(current.current.angle) * current.current.z
     camera.position.y = current.current.y + -pointer.y * 0.4
-    camera.lookAt(1.0, 0, 0)
+    camera.lookAt(offsetX, 0, 0)
   })
 
   return null
@@ -269,16 +301,7 @@ export default function Scene({
         <directionalLight position={[4, 5, 4]} intensity={1.3} color="#FFF6EA" />
         <pointLight position={[-4, -1, -3]} intensity={0.6} color="#B5602E" />
 
-        <group position={[1.8, 0, 0]}>
-          <LiquidBlob scrollRef={scrollRef} />
-          <GridFloor />
-
-          {markers.map((m) => (
-            <NavMarker key={m.label} {...m} onSelect={onSelect} />
-          ))}
-
-          <ContactShadows position={[0, -2.15, 0]} opacity={0.15} scale={10} blur={2.6} color="#241C15" />
-        </group>
+        <ResponsiveBlobGroup scrollRef={scrollRef} markers={markers} onSelect={onSelect} />
 
         <Environment preset="studio" environmentIntensity={0.9} />
 

@@ -5,6 +5,7 @@ import Loader from '@/components/3d/Loader'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useScroll, useMotionValueEvent } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
 
 const Scene = dynamic(() => import('@/components/3d/Scene'), { ssr: false, loading: () => <Loader /> })
 
@@ -82,6 +83,7 @@ export default function HomePage() {
   const [activeProject, setActiveProject] = useState<Project | null>(null)
   const [form, setForm] = useState({ name: '', email: '', message: '', rating: 5 })
   const [submitted, setSubmitted] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const scrollRef = useRef(0)
   const { scrollYProgress } = useScroll()
@@ -153,9 +155,11 @@ export default function HomePage() {
   return (
     <div className="bg-bg text-text selection:bg-accent selection:text-bg">
       {/* NAVIGATION */}
-      <nav className="fixed top-0 z-20 flex w-full items-center justify-between border-b border-border bg-bg/90 backdrop-blur-md px-8 py-4 shadow-sm">
-        <span className="font-heading text-xl font-bold tracking-tight">{profile?.name || 'Pentam Keerthan'}</span>
-        <div className="flex flex-wrap gap-6 text-sm text-text-muted">
+      <nav className="fixed top-0 z-30 flex w-full items-center justify-between border-b border-border bg-bg/90 backdrop-blur-md px-6 py-4 shadow-sm sm:px-8">
+        <span className="font-heading text-lg font-bold tracking-tight sm:text-xl">{profile?.name || 'Pentam Keerthan'}</span>
+
+        {/* Desktop Links */}
+        <div className="hidden sm:flex flex-wrap gap-6 text-sm text-text-muted">
           <button onClick={() => scrollTo('About')} className="transition hover:text-text">About</button>
           <button onClick={() => scrollTo('Education')} className="transition hover:text-text">Education</button>
           <button onClick={() => scrollTo('Skills')} className="transition hover:text-text">Skills</button>
@@ -163,6 +167,27 @@ export default function HomePage() {
           <button onClick={() => scrollTo('Work')} className="transition hover:text-text">Work</button>
           <button onClick={() => scrollTo('Contact')} className="transition hover:text-text">Contact</button>
         </div>
+
+        {/* Mobile Hamburger Toggle Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="sm:hidden text-text p-1 hover:text-accent focus:outline-none"
+          aria-label="Toggle Navigation Menu"
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Mobile Dropdown Drawer */}
+        {menuOpen && (
+          <div className="absolute top-full left-0 w-full border-b border-border bg-bg/95 backdrop-blur-lg px-6 py-6 shadow-2xl sm:hidden flex flex-col gap-4 text-base font-medium">
+            <button onClick={() => { scrollTo('About'); setMenuOpen(false) }} className="text-left transition hover:text-accent">About</button>
+            <button onClick={() => { scrollTo('Education'); setMenuOpen(false) }} className="text-left transition hover:text-accent">Education</button>
+            <button onClick={() => { scrollTo('Skills'); setMenuOpen(false) }} className="text-left transition hover:text-accent">Skills</button>
+            <button onClick={() => { scrollTo('Achievements'); setMenuOpen(false) }} className="text-left transition hover:text-accent">Achievements</button>
+            <button onClick={() => { scrollTo('Work'); setMenuOpen(false) }} className="text-left transition hover:text-accent">Work</button>
+            <button onClick={() => { scrollTo('Contact'); setMenuOpen(false) }} className="text-left transition hover:text-accent">Contact</button>
+          </div>
+        )}
       </nav>
 
       {/* FIXED 3D BACKGROUND — spans full scroll */}
@@ -171,18 +196,18 @@ export default function HomePage() {
       </div>
 
       {/* HERO TEXT */}
-      <section className="relative z-10 flex h-screen w-full items-end pb-24">
-        <div className="max-w-xl px-8">
+      <section className="relative z-10 flex h-screen w-full items-end pb-16 sm:pb-24">
+        <div className="mx-4 max-w-xl rounded-2xl border border-border/60 bg-bg/85 p-6 backdrop-blur-md shadow-xl sm:mx-8 sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
           <p className="text-xs uppercase tracking-widest text-accent font-semibold">{profile?.title || 'AI & Full-Stack Developer'}</p>
-          <h1 className="mt-2 font-heading text-5xl font-extrabold sm:text-6xl">Hi, I'm {profile?.name || 'Pentam Keerthan'}</h1>
-          <p className="mt-4 text-base leading-relaxed text-text-muted">
+          <h1 className="mt-2 font-heading text-4xl font-black text-text sm:text-6xl">Hi, I'm {profile?.name || 'Pentam Keerthan'}</h1>
+          <p className="mt-4 text-sm font-medium leading-relaxed text-text sm:text-base sm:text-text-muted">
             {profile?.summary || 'AI & Full-Stack Developer passionate about building intelligent systems, full-stack web applications, and computer vision solutions. Experienced with Python, Machine Learning, Deep Learning, React.js, Node.js, and PostgreSQL.'}
           </p>
           <div className="pointer-events-auto mt-6 flex gap-4">
-            <button onClick={() => scrollTo('Work')} className="rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-bg transition hover:bg-accent-hover">
+            <button onClick={() => scrollTo('Work')} className="rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-bg transition hover:bg-accent-hover shadow-sm">
               Explore Projects
             </button>
-            <button onClick={() => scrollTo('Contact')} className="rounded-md border border-border px-5 py-2.5 text-sm font-medium transition hover:border-accent">
+            <button onClick={() => scrollTo('Contact')} className="rounded-md border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-text transition hover:border-accent">
               Get In Touch
             </button>
           </div>
